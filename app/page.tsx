@@ -6,20 +6,25 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import "./globals.css";
 import CustomSidebar from "@/components/Sidebar";
+import { User } from "@supabase/supabase-js";
+import { Country } from "@/model/Country";
+import { State } from "@/model/State";
 
 export default function Dashboard() {
+  const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>("Countries");
-  const [countries, setCountries] = useState([
+  const [countries, setCountries] = useState<Country[]>([
     { iso: "BRA", name: "Brazil", region: "South America" },
     { iso: "USA", name: "United States", region: "North America" },
   ]);
-  const [states, setStates] = useState([
+  const [states, setStates] = useState<State[]>([
     { code: "RAA", name: "Brazil", country: "South America" },
     { code: "SAA", name: "United States", country: "North America" },
   ]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [editItem, setEditItem] = useState(null);
-  const [user, setUser] = useState(null);
+  //~ type for editItem based on activeTab
+  const [editItem, setEditItem] = useState<Country | State | null>(null);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -37,7 +42,8 @@ export default function Dashboard() {
     checkUser();
   }, [router]);
 
-  const openModal = (item = null) => {
+  //~ Type openModal argument based on activeTab
+  const openModal = (item: Country | State | null = null) => {
     setEditItem(item);
     setModalOpen(true);
   };
@@ -47,26 +53,27 @@ export default function Dashboard() {
     setEditItem(null);
   };
 
-  const saveItem = (item) => {
+  //~ Type saveItem argument based on activeTab
+  const saveItem = (item: Country | State) => {
     if (activeTab === "Countries") {
       setCountries((prev) => {
-        const index = prev.findIndex((c) => c.iso === item.iso);
+        const index = prev.findIndex((c) => c.iso === (item as Country).iso);
         if (index !== -1) {
           const updated = [...prev];
-          updated[index] = item;
+          updated[index] = item as Country;
           return updated;
         }
-        return [...prev, item];
+        return [...prev, item as Country];
       });
     } else {
       setStates((prev) => {
-        const index = prev.findIndex((s) => s.code === item.code);
+        const index = prev.findIndex((s) => s.code === (item as State).code);
         if (index !== -1) {
           const updated = [...prev];
-          updated[index] = item;
+          updated[index] = item as State;
           return updated;
         }
-        return [...prev, item];
+        return [...prev, item as State];
       });
     }
   };

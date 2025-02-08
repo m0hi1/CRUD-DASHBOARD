@@ -23,8 +23,10 @@ export default function LoginForm() {
 
       if (authError) throw authError;
       router.push("/");
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -48,6 +50,7 @@ export default function LoginForm() {
           required
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
+        <div className="text-gray-500 text-sm"> use: mohit@dev.in</div>
       </div>
 
       <div>
@@ -65,6 +68,7 @@ export default function LoginForm() {
           required
           className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
         />
+        <div className="text-gray-500 text-sm">use: 123456</div>
       </div>
       <button
         type="submit"

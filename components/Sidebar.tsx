@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabaseClient";
-import router from "next/router";
 import { ActiveTab } from "./MainContent";
+import { useRouter } from "next/navigation";
 
 interface SidebarProps {
   activeTab: ActiveTab;
@@ -11,6 +11,7 @@ export default function CustomSidebar({
   activeTab,
   setActiveTab,
 }: SidebarProps) {
+  const router = useRouter();
   return (
     <aside className="w-64 bg-gray-900 text-white p-5">
       <h1 className="text-xl font-bold">DEMO</h1>

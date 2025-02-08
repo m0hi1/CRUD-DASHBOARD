@@ -3,11 +3,23 @@ import { Plus, Edit } from "lucide-react";
 //~ For tracking tabs in sidebar
 export type ActiveTab = "Countries" | "States";
 
+interface Country {
+  iso: string;
+  name: string;
+  region: string;
+}
+
+interface State {
+  code: string;
+  name: string;
+  country: string;
+}
+
 interface MainContentProps {
   activeTab: ActiveTab;
-  countries: Array<{ iso: string; name: string; region: string }>;
-  states: Array<{ code: string; name: string; country: string }>;
-  openModal: (item?: any) => void;
+  countries: Country[];
+  states: State[];
+  openModal: (item?: Country | State) => void;
 }
 
 export default function MainContent({

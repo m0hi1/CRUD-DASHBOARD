@@ -1,15 +1,8 @@
 import { X } from "lucide-react";
-import { ActiveTab } from "./MainContent";
 import { useState } from "react";
-
-interface ModalProps {
-  modalOpen: boolean;
-  closeModal: () => void;
-  editItem: any;
-  activeTab: ActiveTab;
-  countries: Array<{ iso: string; name: string; region: string }>;
-  saveItem: (item: any) => void;
-}
+import { CountryItem } from "@/model/Country";
+import { ModalProps } from "@/model/Data";
+import { StateItem } from "@/model/State";
 
 export default function Modal({
   modalOpen,
@@ -19,20 +12,24 @@ export default function Modal({
   countries,
   saveItem,
 }: ModalProps) {
-  const [iso, setIso] = useState(editItem?.iso || "");
+  const [iso, setIso] = useState((editItem as CountryItem)?.iso || "");
   const [name, setName] = useState(editItem?.name || "");
-  const [region, setRegion] = useState(editItem?.region || "");
-  const [stateCode, setStateCode] = useState(editItem?.code || "");
+  const [region, setRegion] = useState((editItem as CountryItem)?.region || "");
+  const [stateCode, setStateCode] = useState(
+    (editItem as StateItem)?.code || ""
+  );
   const [country, setCountry] = useState(
-    editItem?.country || countries[0]?.name || ""
+    (editItem as StateItem)?.country || countries[0]?.name || ""
   );
 
   const handleSave = () => {
-    const newItem =
-      activeTab === "Countries"
-        ? { ...editItem, iso, name, region }
-        : { ...editItem, code: stateCode, name, country };
-    saveItem(newItem);
+    if (activeTab === "Countries") {
+      const newItem: CountryItem = { iso, name, region };
+      saveItem(newItem);
+    } else {
+      const newItem: StateItem = { code: stateCode, name, country };
+      saveItem(newItem);
+    }
     closeModal();
   };
 

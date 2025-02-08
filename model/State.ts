@@ -1,5 +1,13 @@
 export interface State {
-    iso: string;
+    code: string;
     name: string;
-    region: string;
+    country: string;
+}
+
+
+
+export interface StateItem {
+    code: string;
+    name: string;
+    country: string;
 }
