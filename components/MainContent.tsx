@@ -1,32 +1,12 @@
-import { Plus, Edit } from "lucide-react";
-
-//~ For tracking tabs in sidebar
-export type ActiveTab = "Countries" | "States";
-
-interface Country {
-  iso: string;
-  name: string;
-  region: string;
-}
-
-interface State {
-  code: string;
-  name: string;
-  country: string;
-}
-
-interface MainContentProps {
-  activeTab: ActiveTab;
-  countries: Country[];
-  states: State[];
-  openModal: (item?: Country | State) => void;
-}
+import { MainContentProps } from "@/model/Data";
+import { Plus, Edit, Trash } from "lucide-react";
 
 export default function MainContent({
   activeTab,
   countries,
   states,
   openModal,
+  deleteItem,
 }: MainContentProps) {
   return (
     <main className="flex-1 p-6 bg-gray-100">
@@ -62,12 +42,18 @@ export default function MainContent({
                   <td className="border border-gray-300 px-4 py-2">
                     {country.region}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td className="border border-gray-300 px-4 py-2 text-center">
                     <button
                       onClick={() => openModal(country)}
-                      className="text-blue-500 hover:underline"
+                      className="text-blue-500 hover:underline m-2"
                     >
                       <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => deleteItem(country)}
+                      className="text-red-500 hover:underline"
+                    >
+                      <Trash size={16} />
                     </button>
                   </td>
                 </tr>
@@ -96,12 +82,18 @@ export default function MainContent({
                   <td className="border border-gray-300 px-4 py-2">
                     {state.country}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2">
+                  <td className="border border-gray-300 px-4 py-2 text-center">
                     <button
                       onClick={() => openModal(state)}
-                      className="text-blue-500 hover:underline"
+                      className="text-blue-500 hover:underline m-2"
                     >
                       <Edit size={16} />
+                    </button>
+                    <button
+                      onClick={() => deleteItem(state)}
+                      className="text-red-500 hover:underline"
+                    >
+                      <Trash size={16} />
                     </button>
                   </td>
                 </tr>

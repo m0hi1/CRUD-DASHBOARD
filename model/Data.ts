@@ -1,6 +1,8 @@
-import { ActiveTab } from "@/components/MainContent";
-import { CountryItem } from "./Country";
-import { StateItem } from "./State";
+import { Country, CountryItem } from "./Country";
+import { State, StateItem } from "./State";
+
+export type ActiveTab = "Countries" | "States";
+
 
 export interface ModalProps {
     modalOpen: boolean;
@@ -11,3 +13,10 @@ export interface ModalProps {
     saveItem: (item: CountryItem | StateItem) => void;
 }
 
+export interface MainContentProps {
+    activeTab: ActiveTab;
+    countries: Country[];
+    states: State[];
+    openModal: (item?: Country | State) => void;
+    deleteItem: (item: Country | State) => void;
+}

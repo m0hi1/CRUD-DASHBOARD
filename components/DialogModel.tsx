@@ -1,8 +1,8 @@
+import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { useState } from "react";
-import { CountryItem } from "@/model/Country";
-import { ModalProps } from "@/model/Data";
 import { StateItem } from "@/model/State";
+import { ModalProps } from "@/model/Data";
+import { CountryItem } from "@/model/Country";
 
 export default function Modal({
   modalOpen,
@@ -12,15 +12,25 @@ export default function Modal({
   countries,
   saveItem,
 }: ModalProps) {
-  const [iso, setIso] = useState((editItem as CountryItem)?.iso || "");
-  const [name, setName] = useState(editItem?.name || "");
-  const [region, setRegion] = useState((editItem as CountryItem)?.region || "");
-  const [stateCode, setStateCode] = useState(
-    (editItem as StateItem)?.code || ""
-  );
-  const [country, setCountry] = useState(
-    (editItem as StateItem)?.country || countries[0]?.name || ""
-  );
+  // Form state variables
+  const [iso, setIso] = useState("");
+  const [name, setName] = useState("");
+  const [region, setRegion] = useState("");
+  const [stateCode, setStateCode] = useState("");
+  const [country, setCountry] = useState("");
+
+  // Initialize form state when modal opens or editItem/activeTab changes
+  useEffect(() => {
+    if (activeTab === "Countries") {
+      setIso((editItem as CountryItem)?.iso || "");
+      setName(editItem?.name || "");
+      setRegion((editItem as CountryItem)?.region || "");
+    } else {
+      setStateCode((editItem as StateItem)?.code || "");
+      setName(editItem?.name || "");
+      setCountry((editItem as StateItem)?.country || countries[0]?.name || "");
+    }
+  }, [editItem, activeTab, countries]);
 
   const handleSave = () => {
     if (activeTab === "Countries") {
@@ -30,7 +40,6 @@ export default function Modal({
       const newItem: StateItem = { code: stateCode, name, country };
       saveItem(newItem);
     }
-    closeModal();
   };
 
   if (!modalOpen) return null;
@@ -92,9 +101,9 @@ export default function Modal({
               value={country}
               onChange={(e) => setCountry(e.target.value)}
             >
-              {countries.map((country) => (
-                <option key={country.iso} value={country.name}>
-                  {country.name}
+              {countries.map((c) => (
+                <option key={c.iso} value={c.name}>
+                  {c.name}
                 </option>
               ))}
             </select>
