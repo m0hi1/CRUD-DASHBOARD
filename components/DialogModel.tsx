@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { StateItem } from "@/model/State";
-import { ModalProps } from "@/model/Data";
-import { CountryItem } from "@/model/Country";
+import { MainContentProps } from "@/model/Data";
+import { Country } from "@/model/Country";
+import { State } from "@/model/State";
 
 export default function Modal({
-  modalOpen,
+  isModalOpen,
   closeModal,
   editItem,
   activeTab,
   countries,
   saveItem,
-}: ModalProps) {
+}: MainContentProps) {
   // Form state variables
   const [iso, setIso] = useState("");
   const [name, setName] = useState("");
@@ -22,27 +22,29 @@ export default function Modal({
   // Initialize form state when modal opens or editItem/activeTab changes
   useEffect(() => {
     if (activeTab === "Countries") {
-      setIso((editItem as CountryItem)?.iso || "");
+      setIso((editItem as unknown as Country)?.iso || "");
       setName(editItem?.name || "");
-      setRegion((editItem as CountryItem)?.region || "");
+      setRegion((editItem as unknown as Country)?.region || "");
     } else {
-      setStateCode((editItem as StateItem)?.code || "");
+      setStateCode((editItem as unknown as State)?.code || "");
       setName(editItem?.name || "");
-      setCountry((editItem as StateItem)?.country || countries[0]?.name || "");
+      setCountry(
+        (editItem as unknown as State)?.country || countries[0]?.name || ""
+      );
     }
   }, [editItem, activeTab, countries]);
 
   const handleSave = () => {
     if (activeTab === "Countries") {
-      const newItem: CountryItem = { iso, name, region };
+      const newItem: Country = { iso, name, region };
       saveItem(newItem);
     } else {
-      const newItem: StateItem = { code: stateCode, name, country };
+      const newItem: State = { code: stateCode, name, country };
       saveItem(newItem);
     }
   };
 
-  if (!modalOpen) return null;
+  if (!isModalOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -54,7 +56,7 @@ export default function Modal({
           <X size={20} />
         </button>
         <h2 className="text-xl font-semibold mb-4">
-          {editItem ? "Edit" : "Add"} {activeTab}
+          {editItem?.name ? "Edit" : "Add"} {activeTab}
         </h2>
         {activeTab === "Countries" ? (
           <>

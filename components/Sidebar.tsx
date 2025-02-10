@@ -1,11 +1,7 @@
 import { supabase } from "@/lib/supabaseClient";
-import { ActiveTab } from "./MainContent";
+import { SidebarProps } from "@/model/Data";
 import { useRouter } from "next/navigation";
 
-interface SidebarProps {
-  activeTab: ActiveTab;
-  setActiveTab: (tab: ActiveTab) => void;
-}
 
 export default function CustomSidebar({
   activeTab,

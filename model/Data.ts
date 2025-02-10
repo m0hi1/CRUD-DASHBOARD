@@ -1,22 +1,23 @@
-import { Country, CountryItem } from "./Country";
-import { State, StateItem } from "./State";
+import { Country } from "./Country";
+import { State } from "./State";
 
 export type ActiveTab = "Countries" | "States";
 
-
-export interface ModalProps {
-    modalOpen: boolean;
-    closeModal: () => void;
-    editItem: CountryItem | StateItem | null;
-    activeTab: ActiveTab;
-    countries: Array<{ iso: string; name: string; region: string }>;
-    saveItem: (item: CountryItem | StateItem) => void;
-}
 
 export interface MainContentProps {
     activeTab: ActiveTab;
     countries: Country[];
     states: State[];
     openModal: (item?: Country | State) => void;
+    isModalOpen: boolean;
+    closeModal: () => void;
+    editItem: Country | State | null;
     deleteItem: (item: Country | State) => void;
+    saveItem: (item: Country | State) => void;
+
+}
+
+export interface SidebarProps {
+    activeTab: ActiveTab;
+    setActiveTab: (tab: ActiveTab) => void;
 }

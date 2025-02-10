@@ -1,5 +1,5 @@
-import { MainContentProps } from "@/model/Data";
 import { Plus, Edit, Trash } from "lucide-react";
+import { MainContentProps } from "@/model/Data";
 
 export default function MainContent({
   activeTab,
@@ -31,8 +31,8 @@ export default function MainContent({
               </tr>
             </thead>
             <tbody>
-              {countries.map((country, index) => (
-                <tr key={index}>
+              {countries.map((country) => (
+                <tr key={country.iso}>
                   <td className="border border-gray-300 px-4 py-2">
                     {country.iso}
                   </td>
@@ -42,18 +42,18 @@ export default function MainContent({
                   <td className="border border-gray-300 px-4 py-2">
                     {country.region}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">
+                  <td className="border border-gray-300 px-4 py-2 space-x-2">
                     <button
                       onClick={() => openModal(country)}
-                      className="text-blue-500 hover:underline m-2"
+                      className="text-blue-500 hover:underline"
                     >
-                      <Edit size={16} />
+                      <Edit size={18} />
                     </button>
                     <button
                       onClick={() => deleteItem(country)}
                       className="text-red-500 hover:underline"
                     >
-                      <Trash size={16} />
+                      <Trash size={18} />
                     </button>
                   </td>
                 </tr>
@@ -71,8 +71,8 @@ export default function MainContent({
               </tr>
             </thead>
             <tbody>
-              {states.map((state, index) => (
-                <tr key={index}>
+              {states.map((state) => (
+                <tr key={state.code}>
                   <td className="border border-gray-300 px-4 py-2">
                     {state.code}
                   </td>
@@ -82,18 +82,18 @@ export default function MainContent({
                   <td className="border border-gray-300 px-4 py-2">
                     {state.country}
                   </td>
-                  <td className="border border-gray-300 px-4 py-2 text-center">
+                  <td className="border border-gray-300 px-4 py-2 space-x-2">
                     <button
                       onClick={() => openModal(state)}
-                      className="text-blue-500 hover:underline m-2"
+                      className="text-blue-500 hover:underline"
                     >
-                      <Edit size={16} />
+                      <Edit size={18} />
                     </button>
                     <button
                       onClick={() => deleteItem(state)}
                       className="text-red-500 hover:underline"
                     >
-                      <Trash size={16} />
+                      <Trash size={18} />
                     </button>
                   </td>
                 </tr>

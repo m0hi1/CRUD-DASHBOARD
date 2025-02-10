@@ -5,9 +5,3 @@ export interface State {
 }
 
 
-
-export interface StateItem {
-    code: string;
-    name: string;
-    country: string;
-}

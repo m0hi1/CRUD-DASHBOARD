@@ -1,49 +1,58 @@
 "use client";
+
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import Modal from "@/components/DialogModel";
 import CustomSidebar from "@/components/Sidebar";
+import MainContent from "@/components/MainContent";
+import Modal from "@/components/DialogModel";
 import { User } from "@supabase/supabase-js";
 import { Country } from "@/model/Country";
 import { State } from "@/model/State";
-import MainContent from "@/components/MainContent";
 import { ActiveTab } from "@/model/Data";
 
 export default function Dashboard() {
+  const router = useRouter();
+
   const [user, setUser] = useState<User | null>(null);
   const [activeTab, setActiveTab] = useState<ActiveTab>("Countries");
   const [countries, setCountries] = useState<Country[]>([]);
   const [states, setStates] = useState<State[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [editItem, setEditItem] = useState<Country | State | null>(null);
-  const router = useRouter();
 
   // ------------------------------
   // Data Fetching Functions
   // ------------------------------
 
-  // Fetch Countries with error handling
   const fetchCountries = useCallback(async () => {
-    const { data, error } = await supabase.from("countries").select("*");
-    if (error) {
-      console.error("Error fetching countries:", error.message);
-    } else {
+    try {
+      const { data, error } = await supabase.from("countries").select("*");
+      if (error) throw error;
       setCountries(data as Country[]);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Error fetching countries:", err.message);
+      } else {
+        console.error("Error fetching countries:", err);
+      }
     }
   }, []);
 
-  // Fetch States with error handling
   const fetchStates = useCallback(async () => {
-    const { data, error } = await supabase.from("states").select("*");
-    if (error) {
-      console.error("Error fetching states:", error.message);
-    } else {
+    try {
+      const { data, error } = await supabase.from("states").select("*");
+      if (error) throw error;
       setStates(data as State[]);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Error fetching states:", err.message);
+      } else {
+        console.error("Error fetching states:", err);
+      }
     }
   }, []);
 
-  // Fetch data on mount
   useEffect(() => {
     fetchCountries();
     fetchStates();
@@ -68,92 +77,96 @@ export default function Dashboard() {
   }, [router]);
 
   // ------------------------------
-  // Modal Control
+  // Modal Control Functions
   // ------------------------------
 
-  // Open the modal (for add or edit)
   const openModal = (item: Country | State | null = null) => {
     setEditItem(item);
     setModalOpen(true);
   };
 
-  // Close the modal
   const closeModal = () => {
     setModalOpen(false);
     setEditItem(null);
   };
 
   // ------------------------------
-  // CRUD: Save Edit Delete
+  // CRUD Functions
   // ------------------------------
 
   const saveItem = async (item: Country | State) => {
-    if (activeTab === "Countries") {
-      const country = item as Country;
-      const { error } = await supabase
-        .from("countries")
-        .upsert([country], { onConflict: "iso" });
-      if (error) {
-        console.error("Error saving country:", error.message);
-        return;
+    try {
+      if (activeTab === "Countries") {
+        const country = item as Country;
+        const { data, error } = await supabase
+          .from("countries")
+          .upsert([country], { onConflict: "iso" })
+          .select();
+        if (error) throw error;
+        // Optionally update local state with the returned data
+        const returnedCountry =
+          data && data[0] ? (data[0] as Country) : country;
+        setCountries((prev) => {
+          const index = prev.findIndex((c) => c.iso === returnedCountry.iso);
+          if (index !== -1) {
+            const updated = [...prev];
+            updated[index] = returnedCountry;
+            return updated;
+          }
+          return [...prev, returnedCountry];
+        });
+      } else {
+        const state = item as State;
+        const { data, error } = await supabase
+          .from("states")
+          .upsert([state], { onConflict: "code" })
+          .select();
+        if (error) throw error;
+        const returnedState = data && data[0] ? (data[0] as State) : state;
+        setStates((prev) => {
+          const index = prev.findIndex((s) => s.code === returnedState.code);
+          if (index !== -1) {
+            const updated = [...prev];
+            updated[index] = returnedState;
+            return updated;
+          }
+          return [...prev, returnedState];
+        });
       }
-      // Update local state
-      setCountries((prev) => {
-        const index = prev.findIndex((c) => c.iso === country.iso);
-        if (index !== 1) {
-          const updated = [...prev];
-          updated[index] = country;
-          return updated;
-        }
-        return [...prev, country];
-      });
-    } else {
-      const state = item as State;
-      const { error } = await supabase
-        .from("states")
-        .upsert([state], { onConflict: "code" });
-      if (error) {
-        console.error("Error saving state:", error.message);
-        return;
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Error saving item:", err.message);
+      } else {
+        console.error("Error saving item:", err);
       }
-      // Update local state
-      setStates((prev) => {
-        const index = prev.findIndex((s) => s.code === state.code);
-        if (index !== 1) {
-          const updated = [...prev];
-          updated[index] = state;
-          return updated;
-        }
-        return [...prev, state];
-      });
+    } finally {
+      closeModal();
     }
-    closeModal();
   };
+
   const deleteItem = async (item: Country | State) => {
-    if (activeTab === "Countries") {
-      const country = item as Country;
-      const { error } = await supabase
-        .from("countries")
-        .delete()
-        .eq("iso", country.iso); // assuming iso is unique
-      if (error) {
-        console.error("Error deleting country:", error.message);
-        return;
+    try {
+      if (activeTab === "Countries") {
+        const country = item as Country;
+        const { error } = await supabase
+          .from("countries")
+          .delete()
+          .eq("iso", country.iso);
+        if (error) throw error;
+        setCountries((prev) => prev.filter((c) => c.iso !== country.iso));
+      } else {
+        const state = item as State;
+        const { error } = await supabase
+          .from("states")
+          .delete()
+          .eq("code", state.code);
+        if (error) throw error;
+        setStates((prev) => prev.filter((s) => s.code !== state.code));
       }
-      // Remove the country from local state
-      setCountries((prev) => prev.filter((c) => c.iso !== country.iso));
-    } else {
-      const state = item as State;
-      const { error } = await supabase
-        .from("states")
-        .delete()
-        .eq("code", state.code); // assuming code is unique
-      if (error) {
-        console.error("Error deleting state:", error.message);
-        return;
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Error deleting item:", err.message);
       }
-      // Remove the state from local state
-      setStates((prev) => prev.filter((s) => s.code !== state.code));
     }
   };
 
@@ -176,16 +189,23 @@ export default function Dashboard() {
         activeTab={activeTab}
         countries={countries}
         states={states}
-        openModal={openModal}
         deleteItem={deleteItem}
+        openModal={openModal}
+        isModalOpen={modalOpen}
+        editItem={editItem}
+        saveItem={saveItem}
+        closeModal={closeModal}
       />
       <Modal
-        modalOpen={modalOpen}
+        isModalOpen={modalOpen}
         closeModal={closeModal}
-        editItem={editItem}
         activeTab={activeTab}
         countries={countries}
+        states={states}
+        openModal={openModal}
+        deleteItem={deleteItem}
         saveItem={saveItem}
+        editItem={editItem}
       />
     </div>
   );
